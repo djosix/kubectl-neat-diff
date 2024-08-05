@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-clix/cli v0.2.0
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/itaysk/kubectl-neat v1.2.1-0.20220620125115-4c647f3167a4
 )
 

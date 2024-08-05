@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-clix/cli"
+	"github.com/google/shlex"
 	neat "github.com/itaysk/kubectl-neat/cmd"
 )
 
@@ -27,7 +28,13 @@ func main() {
 			return err
 		}
 
-		c := exec.Command("diff", "-uN", args[0], args[1])
+		diff, err := getDiff()
+		if err != nil {
+			return err
+		}
+		diff = append(diff, args...)
+
+		c := exec.Command(diff[0], diff[1:]...)
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		return c.Run()
@@ -76,4 +83,17 @@ func neatifyDir(dir string) error {
 	}
 
 	return nil
+}
+
+func getDiff() ([]string, error) {
+	if s, ok := os.LookupEnv("KUBECTL_NEAT_DIFF_COMMAND"); ok {
+		argv, err := shlex.Split(s)
+		if err != nil {
+			return nil, err
+		}
+		if len(argv) > 0 {
+			return argv, nil
+		}
+	}
+	return []string{"diff", "-uN"}, nil
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -49,14 +48,14 @@ func main() {
 }
 
 func neatifyDir(dir string) error {
-	fis, err := ioutil.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
 
-	for _, fi := range fis {
-		filename := filepath.Join(dir, fi.Name())
-		data, err := ioutil.ReadFile(filename)
+	for _, entry := range entries {
+		filename := filepath.Join(dir, entry.Name())
+		data, err := os.ReadFile(filename)
 		if err != nil {
 			return err
 		}
@@ -66,7 +65,12 @@ func neatifyDir(dir string) error {
 			return err
 		}
 
-		if err := ioutil.WriteFile(filename, []byte(n), fi.Mode()); err != nil {
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+
+		if err := os.WriteFile(filename, []byte(n), info.Mode()); err != nil {
 			return err
 		}
 	}
